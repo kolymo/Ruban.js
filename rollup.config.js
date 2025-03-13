@@ -1,10 +1,10 @@
-// rollup.config.js
 import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import path from 'path';
+import resolve from '@rollup/plugin-node-resolve'; // Import the resolve plugin
 
 export default {
-  input: path.resolve(__dirname, 'src/index.js'), // entry point
+  input: path.resolve(__dirname, 'src/main.js'), // Entry point
   output: [
     /* {
       file: path.resolve(__dirname, 'dist/ruban.esm.js'),
@@ -13,17 +13,20 @@ export default {
     }, */
     {
       file: path.resolve(__dirname, 'dist/ruban.min.js'),
-      format: 'umd', // Universal Module Definition (works with AMD, CommonJS, global)
+      format: 'umd', // Universal Module Definition
       name: 'Ruban', // Global variable name in browser
       sourcemap: true,
       plugins: [terser()], // Minify the UMD build
     },
   ],
   plugins: [
+    resolve({
+      extensions: ['.js'], // Resolve .js files
+    }),
     babel({
       exclude: 'node_modules/**', // Exclude transpiling dependencies
       presets: ['@babel/preset-env'], // Use modern JavaScript presets
     }),
   ],
-  external: [], // Exclude external dependencies (if any, like jQuery or Lodash)
+  external: [], // Exclude external dependencies
 };

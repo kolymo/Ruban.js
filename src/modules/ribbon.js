@@ -1,5 +1,5 @@
-export function $_(object) {
-
+export default function $_(object) {
+    
     class DOMElement {
 
         constructor(object) {
@@ -19,6 +19,22 @@ export function $_(object) {
             return this.element.innerText;
         }
 
+        // Method to get the label text of the element
+        getLabelText(index = 0) {
+            const inputName =
+                this.element.name ||
+                this.parentElement.querySelectorAll("input, select, textarea")[
+                    index
+                ].name;
+            if (!inputName) return null;
+
+            const label = this.element
+                .closest("form")
+                ?.querySelector(`label[for="${inputId}"]`);
+
+            return label ? label.innerText : null;
+        }
+        
         // Method to set the inner text of the element
         setText(text) {
             this.element.innerText = text;
@@ -49,42 +65,7 @@ export function $_(object) {
             this.element.addEventListener(event, callback);
         }
 
-        // Method to handle POST request for forms (AJAX)
-        async post(url, data = {}) {
-            if (this.element.tagName === 'FORM') {
-                // Convert form data into an object if not passed
-                if (Object.keys(data).length === 0) {
-                    data = new FormData(this.element);
-                    data = Object.fromEntries(data.entries());
-                }
-
-                try {
-                    // Send data using fetch
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(data),
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`Request failed with status: ${response.status}`);
-                    }
-
-                    const responseData = await response.json();
-                    return responseData;
-
-                } catch (error) {
-                    console.error('Error during form submission:', error);
-                    return { error: error.message };
-                }
-            } else {
-                throw new Error('Element is not a form.');
-            }
-        }
     }
 
-    // Return an instance of DOMElement
     return new DOMElement(object);
 }
