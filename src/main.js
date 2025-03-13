@@ -13,4 +13,5 @@ export default Ruban;
 if (typeof window !== 'undefined') {
   window.Ruban = Ruban;
   window.$_ = $_;
+  window.$ = $_;
 }
