@@ -587,6 +587,40 @@ function $_(object) {
   return new DOMElement(object);
 }
 
+var NetworkError = /*#__PURE__*/function (_Error) {
+  function NetworkError(message) {
+    var _this;
+    _classCallCheck(this, NetworkError);
+    _this = _callSuper(this, NetworkError, [message]);
+    _this.name = "NetworkError";
+    return _this;
+  }
+  _inherits(NetworkError, _Error);
+  return _createClass(NetworkError);
+}(/*#__PURE__*/_wrapNativeSuper(Error));
+var TimeoutError = /*#__PURE__*/function (_Error2) {
+  function TimeoutError(message) {
+    var _this2;
+    _classCallCheck(this, TimeoutError);
+    _this2 = _callSuper(this, TimeoutError, [message]);
+    _this2.name = "TimeoutError";
+    return _this2;
+  }
+  _inherits(TimeoutError, _Error2);
+  return _createClass(TimeoutError);
+}(/*#__PURE__*/_wrapNativeSuper(Error));
+var ValidationError = /*#__PURE__*/function (_Error3) {
+  function ValidationError(message) {
+    var _this3;
+    _classCallCheck(this, ValidationError);
+    _this3 = _callSuper(this, ValidationError, [message]);
+    _this3.name = "ValidationError";
+    return _this3;
+  }
+  _inherits(ValidationError, _Error3);
+  return _createClass(ValidationError);
+}(/*#__PURE__*/_wrapNativeSuper(Error));
+
 // Sanitize Input String (Letters and Numbers Only)
 function sanis(inputString) {
   return inputString.replace(/[^a-zA-Z0-9]/g, "");
@@ -734,40 +768,6 @@ function form(object) {
   return new FormElement(object);
 }
 
-var NetworkError = /*#__PURE__*/function (_Error) {
-  function NetworkError(message) {
-    var _this;
-    _classCallCheck(this, NetworkError);
-    _this = _callSuper(this, NetworkError, [message]);
-    _this.name = "NetworkError";
-    return _this;
-  }
-  _inherits(NetworkError, _Error);
-  return _createClass(NetworkError);
-}(/*#__PURE__*/_wrapNativeSuper(Error));
-var TimeoutError = /*#__PURE__*/function (_Error2) {
-  function TimeoutError(message) {
-    var _this2;
-    _classCallCheck(this, TimeoutError);
-    _this2 = _callSuper(this, TimeoutError, [message]);
-    _this2.name = "TimeoutError";
-    return _this2;
-  }
-  _inherits(TimeoutError, _Error2);
-  return _createClass(TimeoutError);
-}(/*#__PURE__*/_wrapNativeSuper(Error));
-var ValidationError = /*#__PURE__*/function (_Error3) {
-  function ValidationError(message) {
-    var _this3;
-    _classCallCheck(this, ValidationError);
-    _this3 = _callSuper(this, ValidationError, [message]);
-    _this3.name = "ValidationError";
-    return _this3;
-  }
-  _inherits(ValidationError, _Error3);
-  return _createClass(ValidationError);
-}(/*#__PURE__*/_wrapNativeSuper(Error));
-
 function get(_x) {
   return _get.apply(this, arguments);
 }
@@ -867,26 +867,69 @@ function _get() {
   return _get.apply(this, arguments);
 }
 
+function getFormData(formElement) {
+  var formData = new FormData(formElement);
+  var formObject = {};
+  formData.forEach(function (value, key) {
+    formObject[key] = value;
+  });
+  return formObject;
+}
+function secureForm(form) {
+  // Setup legit version of form
+  var originalForm = getFormData(form);
+  console.log('Original form:', originalForm);
+
+  // Listen for form submission
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var formObject = getFormData(form);
+    console.log('Form object:', formObject);
+
+    // Compare all keys/name(inputs)
+    var isFormSecure = Object.keys(formObject).every(function (key) {
+      //return originalForm.includes(key);
+      return key in originalForm;
+    });
+    if (isFormSecure) {
+      form.submit();
+    } else {
+      throw new ValidationError('Form is not secure!');
+    }
+  });
+}
+
 var utils = /*#__PURE__*/Object.freeze({
   __proto__: null,
+  NetworkError: NetworkError,
+  TimeoutError: TimeoutError,
+  ValidationError: ValidationError,
   form: form,
   get: get,
   sanis: sanis,
   sanil: sanil,
   sanin: sanin,
-  NetworkError: NetworkError,
-  TimeoutError: TimeoutError,
-  ValidationError: ValidationError
+  secureForm: secureForm
 });
 
 var Ruban = _objectSpread2({
   $_: $_
 }, utils);
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.Ruban = Ruban;
   window.$_ = $_;
   window.$ = $_;
 }
+(function () {
+  console.log("Ruban is ready!");
+  document.addEventListener('DOMContentLoaded', function () {
+    var forms = document.querySelectorAll('form[data-ruban-form-secure="true"]');
+    forms.forEach(function (form) {
+      //console.log('Securing form...', form);
+      Ruban.secureForm(form);
+    });
+  });
+})();
 
 export { Ruban as default };
 //# sourceMappingURL=ruban.esm.js.map

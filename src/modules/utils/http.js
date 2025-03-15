@@ -33,7 +33,7 @@ export async function get(url, options = {}) {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                ...headers, // Merge custom headers (including secret key)
+                ...headers,
             },
             credentials: includeCredentials ? "include" : "omit",
             signal: controller.signal,
