@@ -30,7 +30,7 @@ export default function $_(object) {
 
             const label = this.element
                 .closest("form")
-                ?.querySelector(`label[for="${inputId}"]`);
+                ?.querySelector(`label[for="${inputName}"]`);
 
             return label ? label.innerText : null;
         }

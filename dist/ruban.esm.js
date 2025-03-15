@@ -537,7 +537,7 @@ function $_(object) {
         var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
         var inputName = this.element.name || this.parentElement.querySelectorAll("input, select, textarea")[index].name;
         if (!inputName) return null;
-        var label = (_this$element$closest = this.element.closest("form")) === null || _this$element$closest === void 0 ? void 0 : _this$element$closest.querySelector("label[for=\"".concat(inputId, "\"]"));
+        var label = (_this$element$closest = this.element.closest("form")) === null || _this$element$closest === void 0 ? void 0 : _this$element$closest.querySelector("label[for=\"".concat(inputName, "\"]"));
         return label ? label.innerText : null;
       }
 
