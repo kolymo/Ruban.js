@@ -21,10 +21,13 @@ You can install Ruban.JS by downloading the library directly.
 
 ## Usage 🚀
 
+
 // GET request
+
 Ruban.get({ url: 'https://jsonplaceholder.typicode.com/posts' })
     .then(response => console.log(response))
     .catch(error => console.error(error));
+
 
 // POST request
 
