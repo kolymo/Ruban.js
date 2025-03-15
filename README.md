@@ -29,7 +29,6 @@ Ruban.get({ url: 'https://jsonplaceholder.typicode.com/posts' })
 
 
 // POST request
-
 Ruban.form('myFormID').post({
   url: 'https://jsonplaceholder.typicode.com/posts',
   data: {
