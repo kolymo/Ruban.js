@@ -1,3 +1,4 @@
 export { default as form } from './form';
-export { default as get } from './get';
+export { get } from './http';
 export { sanis, sanil, sanin } from './sanitize';
+export { NetworkError, TimeoutError, ValidationError } from './errors';

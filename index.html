@@ -1,20 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruban.JS</title>
-    <script src="dist/ruban.min.js"></script>
-</head>
-<body style="background-color: #222;">
-    <form id="dikform" action="#" method="post">
-        <label for="name" style="color: white;">Name :</label>
-        <input type="text" name="name" id="name">
-        <button id="submit-btn" type="submit">Submit</button>
-    </form>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Ruban.JS - A Lightweight Helper Library</title>
+        <script src="dist/ruban.min.js"></script>
+        <!-- <link rel="stylesheet" href="./ruban.min.css" /> -->
+        <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    </head>
+    <body class="bg-slate-900 text-white font-sans">
+        <!-- Hero Section -->
+        <div class="min-h-screen flex flex-col justify-center items-center text-center px-4">
+            <h1 class="text-7xl lg:text-8xl xl:text-9xl font-bold mb-4">
+                <span class="text-[#e0470e] animate-pulse">Ruban</span><span class="animate-pulse">.</span><span class="text-amber-300 animate-pulse">JS</span>
+            </h1>
+            <p class="text-xl md:text-2xl lg:text-3xl text-slate-300 mt-20">
+                A <span class="text-blue-400">lightweight</span>,
+                <span class="text-blue-400">small</span>, and
+                <span class="text-blue-400">simple</span> helper library for
+                modern web development.
+            </p>
+            <!-- <div class="flex flex-wrap items-center justify-center gap-10 mt-20">
+                <a href="#features" class="bg-blue-500 hover:bg-blue-600 text-white px-10 py-5 text-2xl rounded-lg transition duration-300">
+                    Explore Features
+                </a>
+                <a href="https://github.com/your-repo"
+                    target="_blank"
+                    class="bg-slate-700 hover:bg-slate-800 text-white px-10 py-5 text-2xl rounded-lg transition duration-300">
+                    GitHub
+                </a>
+            </div> -->
+            <div class="max-w-4xl mx-auto px-4 text-center mt-10">
+                <p class="text-slate-300 mb-8 italic">
+                    Start using Ruban.JS in your project today!
+                </p>
+                <div class="bg-slate-800 p-6 rounded-lg text-left">
+                    <pre class="text-slate-300"><code class="language-html">&lt;script src="https://rubanjs.com/ruban.min.js"&gt;&lt;/script&gt;</code></pre>
+                </div>
+            </div>
+        </div>
 
-    <script>
-        console.log(Ruban.form('dikform'));
-    </script>
-</body>
+        <!-- Features Section -->
+        <!-- <div id="features" class="py-16 bg-slate-800">
+            <div class="max-w-6xl mx-auto px-4">
+                <h2 class="text-4xl font-bold text-center text-blue-400 mb-12">
+                    Features
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+
+                    <div class="bg-slate-700 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-4">
+                            Lightweight
+                        </h3>
+                        <p class="text-xl text-slate-300">
+                            Ruban.JS is incredibly small in size, making it
+                            perfect for performance-focused projects.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-700 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-4">
+                            HTTP Shortcuts
+                        </h3>
+                        <p class="text-xl text-slate-300">
+                            Simplify your HTTP requests with built-in shortcuts
+                            for GET, POST, PUT, and DELETE methods.
+                        </p>
+                    </div>
+   
+                    <div class="bg-slate-700 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        <h3 class="text-2xl font-semibold text-blue-400 mb-4">
+                            Easy to Use
+                        </h3>
+                        <p class="text-xl text-slate-300">
+                            Designed with simplicity in mind, Ruban.JS is easy
+                            to integrate and use in any project.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+        <!-- Get Started Section -->
+        <!-- <div class="py-16 bg-slate-900">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h2 class="text-4xl font-bold text-blue-400 mb-8">
+                    Get Started
+                </h2>
+                <p class="text-slate-300 mb-8">
+                    Start using Ruban.JS in your project today! Simply include
+                    the library and enjoy the simplicity.
+                </p>
+                <div class="bg-slate-800 p-6 rounded-lg text-left">
+                    <pre class="text-slate-300"><code class="language-html">&lt;script src="https://your-cdn-link/ruban.min.js"&gt;&lt;/script&gt;</code></pre>
+                </div>
+            </div>
+        </div> -->
+
+        <!-- Footer -->
+        <footer class="bg-slate-950 py-8 text-center">
+            <p class="text-slate-400">
+                Made with ❤️ <!-- by
+                <a href="https://github.com/your-username" class="text-blue-400 hover:text-blue-500">You</a> -->
+            </p>
+        </footer>
+    </body>
 </html>
