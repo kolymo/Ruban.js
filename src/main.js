@@ -1,8 +1,8 @@
-import $_ from "./modules/ribbon";
+import $ from "./modules/ribbon";
 import * as utils from "./modules/utils";
 
 const Ruban = {
-    $_,
+    $,
     ...utils,
 };
 
@@ -10,23 +10,26 @@ export default Ruban;
 
 if (typeof window !== "undefined") {
     window.Ruban = window.Ruban || Ruban;
-    window.$_ = $_;
-    window.$ = $_;
+    window.$ = $;
 }
 
 (function (global) {
     // Default configuration
     const defaultConfig = {
         debug: false,
-        // theme: "light",
-        // apiEndpoint: "https://api.example.com"
+        forms: {
+            secure: true
+        }
     };
 
     // Ensure global config object exists
     global.RubanConfig = global.RubanConfig || {};
 
+    // Check if RubanConfig manual object was correctly loaded
+    const isManualConfigLoaded = Object.keys(global.RubanConfig).length > 0;
+
     // Check if `ruban.config.js` was loaded
-    const isConfigFileLoaded = Object.keys(global.RubanConfig).length > 0;
+    // TODO:
 
     // Merge config with priority
     const mergeConfigs = (defaultConfig, userConfig) => {
@@ -42,13 +45,14 @@ if (typeof window !== "undefined") {
 
     // Check if config is valid
     const hasValidConfig = Object.values(global.RubanConfig).some(val => val !== undefined);
-    if (!isConfigFileLoaded && !hasValidConfig) {
+    if (!isManualConfigLoaded && !hasValidConfig) {
         console.warn("[Ruban Warning]: No valid configuration found. Using default settings.");
     }
 
+    //console.log("Ruban before extension:", global.Ruban);
+
     // Extend global Ruban object
-    global.Ruban = {
-        ...global.Ruban,
+    Object.assign(global.Ruban, {
         getConfig: () => finalConfig,
         setConfig: (newConfig) => {
             Object.assign(finalConfig, newConfig);
@@ -59,52 +63,68 @@ if (typeof window !== "undefined") {
                 console.log(`[Ruban Debug]: ${message}`);
             }
         }
-    };
+    });
+    //console.log("Ruban after extension:", global.Ruban);
 
     if (!global.Ruban.__DOMContentLoaded) {
-        global.Ruban.__DOMContentLoaded = true;
+       global.Ruban.__DOMContentLoaded = true;
 
         document.addEventListener("DOMContentLoaded", function () {
+
             const forms = document.querySelectorAll('form[data-ruban-form-secure]');
-            forms.forEach((form) => {
-                if (typeof global.Ruban.secureForm === "function") {
-                    form.setAttribute("data-ruban-form-secure", "true");
-                    global.Ruban.secureForm(form);
-                } else {
-                    form.removeAttribute("data-ruban-form-secure");
-                    console.warn("[Ruban Warning]: secureForm function not found. Make sure it is properly imported.");
-                }
 
-                console.log(form);
+            if (finalConfig.forms.secure) {
 
-                form.querySelectorAll('[type="submit"]').forEach((submitBtn) => {
-                    console.log(submitBtn);
-                    submitBtn.addEventListener("click", function (event) {
-                        //event.preventDefault(); // good one
-                        // TODO - Add submitForm function ?
-                        /* if (typeof global.Ruban.submitForm === "function") {
-                            global.Ruban.submitForm(form);
+                if (forms.length) {
+                    forms.forEach((form) => {
+                        //console.log(form);
+
+                        if (typeof global.Ruban.secureForm === "function") {
+                            form.setAttribute("data-ruban-form-secure", "true");
+                            try {
+                                global.Ruban.secureForm(form);
+                            } catch (error) {
+                                form.removeAttribute("data-ruban-form-secure");
+                                finalConfig.debug ? console.warn("[Ruban Warning]: Could not secure form:", form) : null;
+                            }
                         } else {
-                            console.warn("[Ruban Warning]: submitForm function not found. Make sure it is properly imported.");
-                        } */
+                            form.removeAttribute("data-ruban-form-secure");
+                            console.warn("[Ruban Warning]: secureForm function not found. Make sure it is properly imported.");
+                        }
+
+                        form.querySelectorAll('[type="submit"]').forEach((submitBtn) => {
+                            console.log(submitBtn);
+                            submitBtn.addEventListener("click", function (event) {
+                                event.preventDefault();
+                                // TODO - Add submitForm function ?
+                                /* if (typeof global.Ruban.submitForm === "function") {
+                                    global.Ruban.submitForm(form);
+                                } else {
+                                    console.warn("[Ruban Warning]: submitForm function not found. Make sure it is properly imported.");
+                                } */
+                            });
+                        });
+
+                        form.addEventListener("submit", function (event) {
+                            event.preventDefault();
+                            // TODO - Add submitForm function ?
+                            /* if (typeof global.Ruban.submitForm === "function") {
+                                global.Ruban.submitForm(form);
+                            } else {
+                                console.warn("[Ruban Warning]: submitForm function not found. Make sure it is properly imported.");
+                            } */
+                        });
                     });
-                });
 
-                form.addEventListener("submit", function (event) {
-                    //event.preventDefault();
-                    // TODO - Add submitForm function ?
-                    /* if (typeof global.Ruban.submitForm === "function") {
-                        global.Ruban.submitForm(form);
-                    } else {
-                        console.warn("[Ruban Warning]: submitForm function not found. Make sure it is properly imported.");
-                    } */
-                });
-            });
+                    // Only dispatch event if forms exist
+                    document.dispatchEvent(new Event("Ruban-Forms-Secured"));
 
-            // Only dispatch event if forms exist
-            if (forms.length > 0) {
-                document.dispatchEvent(new Event("Ruban_DOMContentLoaded"));
-            }
+                } else {
+                    if (finalConfig.debug) {
+                        console.warn("[Ruban Warning]: No forms were found to secure.");
+                    }
+                }
+            } else if (forms.length && finalConfig.debug) console.warn("[Ruban Warning]: Forms were found to secure but the global variable to secure forms is set to false.");
         });
     }
 
@@ -112,3 +132,10 @@ if (typeof window !== "undefined") {
     console.log("Ruban is ready!");
 
 })(window);
+
+// Protect Ruban from being overwritten
+Object.defineProperty(window, 'Ruban', {
+    value: window.Ruban,
+    writable: false,
+    configurable: false
+});

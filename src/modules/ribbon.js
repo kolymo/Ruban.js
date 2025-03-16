@@ -1,4 +1,4 @@
-export default function $_(object) {
+export default function $(object) {
     
     class DOMElement {
 
