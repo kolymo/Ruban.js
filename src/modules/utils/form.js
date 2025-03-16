@@ -15,6 +15,17 @@ export default function form(object) {
             }
         }
 
+        getLabelText(index = 0) {
+            const inputs = this.element.querySelectorAll("input, select, textarea");
+            if (index >= inputs.length) return null;
+
+            const inputName = inputs[index].name;
+            if (!inputName) return null;
+
+            const label = this.element.querySelector(`label[for="${inputName}"]`);
+            return label ? label.innerText : null;
+        }
+
         async post({ data = {}, options = { csrf: true, textOnly: false }, url = window.location.href } = {}) {
             // Convert form data into an object if not passed
             if (Object.keys(data).length === 0) {

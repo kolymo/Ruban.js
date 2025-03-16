@@ -533,11 +533,11 @@ function $_(object) {
     }, {
       key: "getLabelText",
       value: function getLabelText() {
-        var _this$element$closest;
+        var _this$element$closest, _this$element$closest2;
         var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-        var inputName = this.element.name || this.parentElement.querySelectorAll("input, select, textarea")[index].name;
+        var inputName = this.element.name || ((_this$element$closest = this.element.closest('form')) === null || _this$element$closest === void 0 ? void 0 : _this$element$closest.querySelectorAll("input, select, textarea")[index].name);
         if (!inputName) return null;
-        var label = (_this$element$closest = this.element.closest("form")) === null || _this$element$closest === void 0 ? void 0 : _this$element$closest.querySelector("label[for=\"".concat(inputName, "\"]"));
+        var label = (_this$element$closest2 = this.element.closest("form")) === null || _this$element$closest2 === void 0 ? void 0 : _this$element$closest2.querySelector("label[for=\"".concat(inputName, "\"]"));
         return label ? label.innerText : null;
       }
 
@@ -660,6 +660,17 @@ function form(object) {
       }
     }
     return _createClass(FormElement, [{
+      key: "getLabelText",
+      value: function getLabelText() {
+        var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var inputs = this.element.querySelectorAll("input, select, textarea");
+        if (index >= inputs.length) return null;
+        var inputName = inputs[index].name;
+        if (!inputName) return null;
+        var label = this.element.querySelector("label[for=\"".concat(inputName, "\"]"));
+        return label ? label.innerText : null;
+      }
+    }, {
       key: "post",
       value: function () {
         var _post = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
@@ -888,7 +899,6 @@ function secureForm(form) {
 
     // Compare all keys/name(inputs)
     var isFormSecure = Object.keys(formObject).every(function (key) {
-      //return originalForm.includes(key);
       return key in originalForm;
     });
     if (isFormSecure) {
@@ -916,20 +926,103 @@ var Ruban = _objectSpread2({
   $_: $_
 }, utils);
 if (typeof window !== "undefined") {
-  window.Ruban = Ruban;
+  window.Ruban = window.Ruban || Ruban;
   window.$_ = $_;
   window.$ = $_;
 }
-(function () {
-  console.log("Ruban is ready!");
-  document.addEventListener('DOMContentLoaded', function () {
-    var forms = document.querySelectorAll('form[data-ruban-form-secure="true"]');
-    forms.forEach(function (form) {
-      //console.log('Securing form...', form);
-      Ruban.secureForm(form);
+(function (global) {
+  // Default configuration
+  var defaultConfig = {
+    debug: false
+    // theme: "light",
+    // apiEndpoint: "https://api.example.com"
+  };
+
+  // Ensure global config object exists
+  global.RubanConfig = global.RubanConfig || {};
+
+  // Check if `ruban.config.js` was loaded
+  var isConfigFileLoaded = Object.keys(global.RubanConfig).length > 0;
+
+  // Merge config with priority
+  var mergeConfigs = function mergeConfigs(defaultConfig, userConfig) {
+    var result = _objectSpread2({}, defaultConfig);
+    Object.keys(userConfig).forEach(function (key) {
+      if (userConfig[key] !== undefined) {
+        result[key] = userConfig[key];
+      }
     });
+    return result;
+  };
+  var finalConfig = mergeConfigs(defaultConfig, global.RubanConfig);
+
+  // Check if config is valid
+  var hasValidConfig = Object.values(global.RubanConfig).some(function (val) {
+    return val !== undefined;
   });
-})();
+  if (!isConfigFileLoaded && !hasValidConfig) {
+    console.warn("[Ruban Warning]: No valid configuration found. Using default settings.");
+  }
+
+  // Extend global Ruban object
+  global.Ruban = _objectSpread2(_objectSpread2({}, global.Ruban), {}, {
+    getConfig: function getConfig() {
+      return finalConfig;
+    },
+    setConfig: function setConfig(newConfig) {
+      Object.assign(finalConfig, newConfig);
+      global.manualRubanConfigSet = true;
+    },
+    log: function log(message) {
+      if (finalConfig.debug) {
+        console.log("[Ruban Debug]: ".concat(message));
+      }
+    }
+  });
+  if (!global.Ruban.__DOMContentLoaded) {
+    global.Ruban.__DOMContentLoaded = true;
+    document.addEventListener("DOMContentLoaded", function () {
+      var forms = document.querySelectorAll('form[data-ruban-form-secure]');
+      forms.forEach(function (form) {
+        if (typeof global.Ruban.secureForm === "function") {
+          form.setAttribute("data-ruban-form-secure", "true");
+          global.Ruban.secureForm(form);
+        } else {
+          form.removeAttribute("data-ruban-form-secure");
+          console.warn("[Ruban Warning]: secureForm function not found. Make sure it is properly imported.");
+        }
+        console.log(form);
+        form.querySelectorAll('[type="submit"]').forEach(function (submitBtn) {
+          console.log(submitBtn);
+          submitBtn.addEventListener("click", function (event) {
+            //event.preventDefault(); // good one
+            // TODO - Add submitForm function ?
+            /* if (typeof global.Ruban.submitForm === "function") {
+                global.Ruban.submitForm(form);
+            } else {
+                console.warn("[Ruban Warning]: submitForm function not found. Make sure it is properly imported.");
+            } */
+          });
+        });
+        form.addEventListener("submit", function (event) {
+          //event.preventDefault();
+          // TODO - Add submitForm function ?
+          /* if (typeof global.Ruban.submitForm === "function") {
+              global.Ruban.submitForm(form);
+          } else {
+              console.warn("[Ruban Warning]: submitForm function not found. Make sure it is properly imported.");
+          } */
+        });
+      });
+
+      // Only dispatch event if forms exist
+      if (forms.length > 0) {
+        document.dispatchEvent(new Event("Ruban_DOMContentLoaded"));
+      }
+    });
+  }
+  console.log("Ruban is ready!");
+})(window);
 
 export { Ruban as default };
 //# sourceMappingURL=ruban.esm.js.map

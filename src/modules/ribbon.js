@@ -23,14 +23,10 @@ export default function $_(object) {
         getLabelText(index = 0) {
             const inputName =
                 this.element.name ||
-                this.parentElement.querySelectorAll("input, select, textarea")[
-                    index
-                ].name;
+                this.element.closest('form')?.querySelectorAll("input, select, textarea")[index].name;
             if (!inputName) return null;
 
-            const label = this.element
-                .closest("form")
-                ?.querySelector(`label[for="${inputName}"]`);
+            const label = this.element.closest("form")?.querySelector(`label[for="${inputName}"]`);
 
             return label ? label.innerText : null;
         }

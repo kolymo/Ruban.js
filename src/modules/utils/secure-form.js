@@ -24,7 +24,7 @@ export default function secureForm(form) {
 
         // Compare all keys/name(inputs)
         const isFormSecure = Object.keys(formObject).every((key) => {
-            //return originalForm.includes(key);
+
             return key in originalForm;
         });
 
