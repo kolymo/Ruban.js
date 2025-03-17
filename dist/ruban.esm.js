@@ -927,7 +927,7 @@ var Ruban = _objectSpread2({
 }, utils);
 if (typeof window !== "undefined") {
   window.Ruban = window.Ruban || Ruban;
-  window.$ = $;
+  //window.$ = $;
 }
 (function (global) {
   // Default configuration

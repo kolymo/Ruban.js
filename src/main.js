@@ -10,7 +10,7 @@ export default Ruban;
 
 if (typeof window !== "undefined") {
     window.Ruban = window.Ruban || Ruban;
-    window.$ = $;
+    //window.$ = $; // Conflicts too often
 }
 
 (function (global) {
