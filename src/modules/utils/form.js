@@ -13,6 +13,18 @@ export default function form(object) {
             if (this.element.tagName !== "FORM") {
                 throw new Error("Element is not a form.");
             }
+
+            if (window.RubanConfig.debug) {
+                console.log('Constructor', this.element);
+            }
+
+            
+            this.element.addEventListener('submit', function (event) {
+                event.preventDefault();
+                (window.RubanConfig.debug) ? console.log('Constructor Form Submission Prevented') : null;
+
+                
+            });
         }
 
         getLabelText(index = 0) {
@@ -27,6 +39,7 @@ export default function form(object) {
         }
 
         async post({ data = {}, options = { csrf: true, textOnly: false }, url = window.location.href } = {}) {
+
             // Convert form data into an object if not passed
             if (Object.keys(data).length === 0) {
                 data = new FormData(this.element);
@@ -41,13 +54,13 @@ export default function form(object) {
                 );
             }
 
+            // TODO: Check if there was already one in the formData
             // Check for CSRF token
-            let csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            if (!csrfToken) {
-                csrfToken = document.querySelector('input[name="_csrf"]')?.value || document.querySelector('input[name="csrf"]')?.value;
-            }
+            let csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || 
+            document.querySelector('input[name*="csrf"]')?.value;
+
             if (!csrfToken && options.csrf) {
-                throw new Error("CSRF token not found.");
+            throw new Error("CSRF token not found.");
             }
 
 

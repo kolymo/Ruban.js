@@ -22,19 +22,20 @@ You can install Ruban.JS by downloading the library directly.
 ## Usage 🚀
 
 ```js
-// GET request
+// GET request example
 Ruban.get({ url: 'https://jsonplaceholder.typicode.com/posts' })
     .then(response => console.log(response))
     .catch(error => console.error(error));
 
 
-// POST request
-Ruban.form('myFormID').post({
-  url: 'https://jsonplaceholder.typicode.com/posts',
+// POST request example
+const myRubanForm = new Ruban.form('form-id');
+myRubanForm.post({
+  url: 'https://example.com/api/something',
   data: {
     title: 'foo',
     body: 'bar',
-    userId: 1,
+    userID: 1,
   }
 })
 .then(response => console.log(response))

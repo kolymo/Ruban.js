@@ -658,6 +658,18 @@ function form(object) {
       if (this.element.tagName !== "FORM") {
         throw new Error("Element is not a form.");
       }
+      if (window.RubanConfig.debug) {
+        console.log('Constructor', this.element);
+      }
+      this.element.addEventListener('submit', function (event) {
+        event.preventDefault();
+        console.log('Constructor Form Submission Prevented');
+      });
+
+      /* form.querySelectorAll('[type="submit"]').forEach(function (submitbtn) {
+              submitbtn.preventDefault();
+          });
+      }); */
     }
     return _createClass(FormElement, [{
       key: "getLabelText",
@@ -674,7 +686,7 @@ function form(object) {
       key: "post",
       value: function () {
         var _post = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-          var _document$querySelect;
+          var _document$querySelect, _document$querySelect2;
           var _ref,
             _ref$data,
             data,
@@ -683,8 +695,6 @@ function form(object) {
             _ref$url,
             url,
             csrfToken,
-            _document$querySelect2,
-            _document$querySelect3,
             headers,
             response,
             responseData,
@@ -711,55 +721,52 @@ function form(object) {
                 }
 
                 // Check for CSRF token
-                csrfToken = (_document$querySelect = document.querySelector('meta[name="csrf-token"]')) === null || _document$querySelect === void 0 ? void 0 : _document$querySelect.content;
-                if (!csrfToken) {
-                  csrfToken = ((_document$querySelect2 = document.querySelector('input[name="_csrf"]')) === null || _document$querySelect2 === void 0 ? void 0 : _document$querySelect2.value) || ((_document$querySelect3 = document.querySelector('input[name="csrf"]')) === null || _document$querySelect3 === void 0 ? void 0 : _document$querySelect3.value);
-                }
+                csrfToken = ((_document$querySelect = document.querySelector('meta[name="csrf-token"]')) === null || _document$querySelect === void 0 ? void 0 : _document$querySelect.content) || ((_document$querySelect2 = document.querySelector('input[name*="csrf"]')) === null || _document$querySelect2 === void 0 ? void 0 : _document$querySelect2.value);
                 if (!(!csrfToken && options.csrf)) {
-                  _context.next = 6;
+                  _context.next = 5;
                   break;
                 }
                 throw new Error("CSRF token not found.");
-              case 6:
+              case 5:
                 // Headers
                 headers = _objectSpread2({
                   "Content-Type": "application/json"
                 }, options.csrf && csrfToken ? {
                   "X-CSRF-Token": csrfToken
                 } : {});
-                _context.prev = 7;
-                _context.next = 10;
+                _context.prev = 6;
+                _context.next = 9;
                 return fetch(url, {
                   method: "POST",
                   headers: headers,
                   body: JSON.stringify(data),
                   credentials: "include"
                 });
-              case 10:
+              case 9:
                 response = _context.sent;
                 if (response.ok) {
-                  _context.next = 13;
+                  _context.next = 12;
                   break;
                 }
                 throw new Error("Request failed with status: ".concat(response.status));
-              case 13:
-                _context.next = 15;
+              case 12:
+                _context.next = 14;
                 return response.json();
-              case 15:
+              case 14:
                 responseData = _context.sent;
                 return _context.abrupt("return", responseData);
-              case 19:
-                _context.prev = 19;
-                _context.t0 = _context["catch"](7);
+              case 18:
+                _context.prev = 18;
+                _context.t0 = _context["catch"](6);
                 console.error("Error during form submission:", _context.t0);
                 return _context.abrupt("return", {
                   error: _context.t0.message
                 });
-              case 23:
+              case 22:
               case "end":
                 return _context.stop();
             }
-          }, _callee, this, [[7, 19]]);
+          }, _callee, this, [[6, 18]]);
         }));
         function post() {
           return _post.apply(this, arguments);
@@ -904,7 +911,7 @@ function secureForm(form) {
     if (isFormSecure) {
       form.submit();
     } else {
-      throw new ValidationError('Form is not secure!');
+      throw new ValidationError('Form is not secure or has been modified!');
     }
   });
 }
@@ -927,7 +934,7 @@ var Ruban = _objectSpread2({
 }, utils);
 if (typeof window !== "undefined") {
   window.Ruban = window.Ruban || Ruban;
-  //window.$ = $;
+  //window.$ = $; // Conflicts too often
 }
 (function (global) {
   // Default configuration
@@ -958,6 +965,7 @@ if (typeof window !== "undefined") {
     return result;
   };
   var finalConfig = mergeConfigs(defaultConfig, global.RubanConfig);
+  global.RubanConfig = finalConfig;
 
   // Check if config is valid
   var hasValidConfig = Object.values(global.RubanConfig).some(function (val) {
@@ -966,78 +974,46 @@ if (typeof window !== "undefined") {
   if (!isManualConfigLoaded && !hasValidConfig) {
     console.warn("[Ruban Warning]: No valid configuration found. Using default settings.");
   }
-
   //console.log("Ruban before extension:", global.Ruban);
 
-  // Extend global Ruban object
-  Object.assign(global.Ruban, {
-    getConfig: function getConfig() {
-      return finalConfig;
-    },
-    setConfig: function setConfig(newConfig) {
-      Object.assign(finalConfig, newConfig);
-      global.manualRubanConfigSet = true;
-    },
-    log: function log(message) {
-      if (finalConfig.debug) {
-        console.log("[Ruban Debug]: ".concat(message));
+  if (finalConfig.debug) {
+    // Extend global Ruban object
+    Object.assign(global.Ruban, {
+      getConfig: function getConfig() {
+        return finalConfig;
+      },
+      setConfig: function setConfig(newConfig) {
+        Object.assign(finalConfig, newConfig);
+        //global.manualRubanConfigSet = true;
+      },
+      log: function log(message) {
+        return console.log("[Ruban Debug]: ".concat(message));
       }
-    }
-  });
+    });
+  }
+
   //console.log("Ruban after extension:", global.Ruban);
 
   if (!global.Ruban.__DOMContentLoaded) {
     global.Ruban.__DOMContentLoaded = true;
     document.addEventListener("DOMContentLoaded", function () {
       var forms = document.querySelectorAll('form[data-ruban-form-secure]');
-      if (finalConfig.forms.secure) {
-        if (forms.length) {
-          forms.forEach(function (form) {
-            //console.log(form);
+      if (forms.length) {
+        if (finalConfig.forms.secure) ; else {
+          if (forms.length && finalConfig.debug) {
+            console.warn("[Ruban Warning]: Forms were found to secure but the global variable to secure forms is set to false.");
+          }
+        }
 
-            if (typeof global.Ruban.secureForm === "function") {
-              form.setAttribute("data-ruban-form-secure", "true");
-              try {
-                global.Ruban.secureForm(form);
-              } catch (error) {
-                form.removeAttribute("data-ruban-form-secure");
-                finalConfig.debug ? console.warn("[Ruban Warning]: Could not secure form:", form) : null;
-              }
-            } else {
-              form.removeAttribute("data-ruban-form-secure");
-              console.warn("[Ruban Warning]: secureForm function not found. Make sure it is properly imported.");
-            }
-            form.querySelectorAll('[type="submit"]').forEach(function (submitBtn) {
-              console.log(submitBtn);
-              submitBtn.addEventListener("click", function (event) {
-                event.preventDefault();
-                // TODO - Add submitForm function ?
-                /* if (typeof global.Ruban.submitForm === "function") {
-                    global.Ruban.submitForm(form);
-                } else {
-                    console.warn("[Ruban Warning]: submitForm function not found. Make sure it is properly imported.");
-                } */
-              });
-            });
-            form.addEventListener("submit", function (event) {
-              event.preventDefault();
-              // TODO - Add submitForm function ?
-              /* if (typeof global.Ruban.submitForm === "function") {
-                  global.Ruban.submitForm(form);
-              } else {
-                  console.warn("[Ruban Warning]: submitForm function not found. Make sure it is properly imported.");
-              } */
-            });
-          });
-
-          // Only dispatch event if forms exist
-          document.dispatchEvent(new Event("Ruban-Forms-Secured"));
-        } else {
-          if (finalConfig.debug) {
+        // Only dispatch event if forms exist
+        //document.dispatchEvent(new Event("Ruban-Forms-Secured"));
+      } else {
+        if (finalConfig.debug) {
+          if (finalConfig.forms.secure) {
             console.warn("[Ruban Warning]: No forms were found to secure.");
           }
         }
-      } else if (forms.length && finalConfig.debug) console.warn("[Ruban Warning]: Forms were found to secure but the global variable to secure forms is set to false.");
+      }
     });
   }
   console.log("Ruban is ready!");

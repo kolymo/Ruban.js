@@ -19,19 +19,19 @@ export default function secureForm(form) {
     // Listen for form submission
     form.addEventListener('submit', (event) => {
         event.preventDefault();
+        
         const formObject = getFormData(form);
         console.log('Form object:', formObject);
 
         // Compare all keys/name(inputs)
         const isFormSecure = Object.keys(formObject).every((key) => {
-
             return key in originalForm;
         });
 
         if (isFormSecure) {
             form.submit();
         } else {
-            throw new ValidationError('Form is not secure!');
+            throw new ValidationError('Form is not secure or has been modified!');
         }
     });
 }
