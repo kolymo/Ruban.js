@@ -663,13 +663,8 @@ function form(object) {
       }
       this.element.addEventListener('submit', function (event) {
         event.preventDefault();
-        console.log('Constructor Form Submission Prevented');
+        window.RubanConfig.debug ? console.log('Constructor Form Submission Prevented') : null;
       });
-
-      /* form.querySelectorAll('[type="submit"]').forEach(function (submitbtn) {
-              submitbtn.preventDefault();
-          });
-      }); */
     }
     return _createClass(FormElement, [{
       key: "getLabelText",
@@ -720,6 +715,7 @@ function form(object) {
                   }));
                 }
 
+                // TODO: Check if there was already one in the formData
                 // Check for CSRF token
                 csrfToken = ((_document$querySelect = document.querySelector('meta[name="csrf-token"]')) === null || _document$querySelect === void 0 ? void 0 : _document$querySelect.content) || ((_document$querySelect2 = document.querySelector('input[name*="csrf"]')) === null || _document$querySelect2 === void 0 ? void 0 : _document$querySelect2.value);
                 if (!(!csrfToken && options.csrf)) {
@@ -916,6 +912,12 @@ function secureForm(form) {
   });
 }
 
+function wait(ms) {
+  return new Promise(function (resolve) {
+    return setTimeout(resolve, ms);
+  });
+}
+
 var utils = /*#__PURE__*/Object.freeze({
   __proto__: null,
   NetworkError: NetworkError,
@@ -926,7 +928,8 @@ var utils = /*#__PURE__*/Object.freeze({
   sanis: sanis,
   sanil: sanil,
   sanin: sanin,
-  secureForm: secureForm
+  secureForm: secureForm,
+  wait: wait
 });
 
 var Ruban = _objectSpread2({
@@ -941,7 +944,7 @@ if (typeof window !== "undefined") {
   var defaultConfig = {
     debug: false,
     forms: {
-      secure: true
+      secure: false
     }
   };
 

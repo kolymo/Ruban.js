@@ -18,7 +18,7 @@ if (typeof window !== "undefined") {
     const defaultConfig = {
         debug: false,
         forms: {
-            secure: true
+            secure: false
         }
     };
 
